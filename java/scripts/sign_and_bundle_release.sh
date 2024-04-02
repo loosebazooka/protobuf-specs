@@ -63,13 +63,15 @@ main() {
   cd "$RELEASE_DIR"
 
   # cosign sign all the files
-  echo "Signing with cosign"
+  echo "signing with sigstore-java cli"
   for file in *; do
-      # skip intoto attestations, they are already signed
-     if [[ "$file" == *.intoto.jsonl ]] ; then
-       continue;
-     fi
-     COSIGN_EXPERIMENTAL=1 cosign sign-blob --yes "$file" --output-signature="$file.sig" --output-certificate="$file.pem" --bundle "$file.bundle"
+    # skip intoto attestations, they are already signed
+    if [[ $file == *.intoto.jsonl ]] ; then
+      continue;
+    fi
+    fileabs=$(realpath "$file")
+    # gradle doesn't like running from the "release dir"
+    (cd ~/src/sigstore-java && ./gradlew :sigstore-cli:run --args "sign --bundle $fileabs.sigstore.json $fileabs")
   done
 
   # then gpg sign all the files (including sigstore files)
