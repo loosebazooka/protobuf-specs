@@ -1,4 +1,4 @@
-name: Release
+name: Release Services Build Container
 
 on:
   push:
@@ -25,7 +25,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build services container
-      run: make services-images
+      run: make services-image
 
     - name: Tag image
       run: docker tag protoc-services ghcr.io/${{ github.repository }}:${{ github.ref_name }}
