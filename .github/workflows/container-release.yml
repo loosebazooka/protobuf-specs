@@ -20,6 +20,18 @@ on:
     - 'release/service-builder/v*'
 
 jobs:
+  strip-tag:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: process tag
+        id: version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          echo "version=${TAG#"release/service-builder/v"}" >> $GITHUB_OUTPUT
+
   release:
     runs-on: ubuntu-latest
 
@@ -32,7 +44,7 @@ jobs:
     env:
       REGISTRY: ghcr.io
       IMAGE_NO_TAG: ghcr.io/${{ github.repository }}-service-builder
-      IMAGE_REF: ghcr.io/${{ github.repository }}-service-builder:${{ github.ref_name }}
+      IMAGE_REF: ghcr.io/${{ github.repository }}-service-builder:${{ env.TAG }}
 
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
